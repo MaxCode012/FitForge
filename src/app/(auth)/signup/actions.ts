@@ -18,10 +18,12 @@ export async function signUp(
     const passwordHash = await hash(password, {
       memoryCost: 19456,
       timeCost: 2,
-      outputLen: 2,
+      outputLen: 32,
       parallelism: 1,
     });
+
     const userId = generateIdFromEntropySize(10);
+
     const existingUsername = await prisma.user.findFirst({
       where: {
         username: {
@@ -30,6 +32,7 @@ export async function signUp(
         },
       },
     });
+
     if (existingUsername) {
       return {
         error: "Username already taken",
@@ -68,12 +71,13 @@ export async function signUp(
       sessionCookie.value,
       sessionCookie.attributes
     );
+
     return redirect("/");
   } catch (error) {
     if (isRedirectError(error)) throw error;
     console.error(error);
     return {
-      error: "Something went wrong please try again",
+      error: "Something went wrong. Please try again.",
     };
   }
 }

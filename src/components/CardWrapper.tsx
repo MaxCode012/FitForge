@@ -15,6 +15,7 @@ interface CardWrapperProps {
   backButtonHref: string;
   backButtonLabel: string;
   children: React.ReactNode;
+  className: string;
 }
 
 export default function CardWrapper({
@@ -23,9 +24,10 @@ export default function CardWrapper({
   backButtonHref,
   backButtonLabel,
   children,
+  className,
 }: CardWrapperProps) {
   return (
-    <Card className="w-full px-5">
+    <Card className={className}>
       <CardHeader>
         <AuthHeader label={label} title={title} />
       </CardHeader>

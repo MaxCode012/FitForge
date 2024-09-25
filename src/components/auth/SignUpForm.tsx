@@ -14,8 +14,16 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { useState, useTransition } from "react";
+import { signUp } from "@/app/(auth)/signup/actions";
+import { PasswordInput } from "../PasswordInput";
+import LoadingButton from "../LoadingButton";
 
 export default function SignUpForm() {
+  const [error, setError] = useState<string>();
+
+  const [isPending, startTransition] = useTransition();
+
   const form = useForm<SignUpValues>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -25,8 +33,14 @@ export default function SignUpForm() {
     },
   });
 
-  const onSubmit = () => {
-    console.log("submitted");
+  const onSubmit = (values: SignUpValues) => {
+    setError(undefined);
+    startTransition(async () => {
+      const { error } = await signUp(values);
+      if (error) {
+        setError(error);
+      }
+    });
   };
   return (
     <CardWrapper
@@ -34,9 +48,13 @@ export default function SignUpForm() {
       title="Sign up"
       backButtonHref="/login"
       backButtonLabel="Already have an account? Login."
+      className="w-[300px] xl:w-[400px]"
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          {error && (
+            <p className="text-center text-destructive text-xs">{error}</p>
+          )}
           <div className="space-y-4">
             <FormField
               control={form.control}
@@ -80,11 +98,7 @@ export default function SignUpForm() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input
-                        {...field}
-                        type="password"
-                        placeholder="********"
-                      />
+                      <PasswordInput placeholder="********" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -92,9 +106,9 @@ export default function SignUpForm() {
               }}
             />
           </div>
-          <Button type="submit" className="w-full">
+          <LoadingButton loading={isPending} type="submit" className="w-full">
             Sign up
-          </Button>
+          </LoadingButton>
         </form>
       </Form>
     </CardWrapper>
