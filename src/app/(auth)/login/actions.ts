@@ -52,7 +52,7 @@ export async function login(
 
     return redirect("/");
   } catch (error) {
-    if (isRedirectError(error)) return { error: "redirect error" };
+    if (isRedirectError(error)) throw error;
     console.error(error);
     return {
       error: "Something went wrong. Please try again.",

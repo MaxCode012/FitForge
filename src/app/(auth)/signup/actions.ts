@@ -74,7 +74,7 @@ export async function signUp(
 
     return redirect("/");
   } catch (error) {
-    if (isRedirectError(error)) return { error: "Redirect error" };
+    if (isRedirectError(error)) throw error;
     console.error(error);
     return {
       error: "Something went wrong. Please try again.",
