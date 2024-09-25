@@ -1,9 +1,10 @@
 "use server";
-import prisma from "@/lib/prisma";
-import { verify } from "@node-rs/argon2";
-import { logInSchema, LogInValues } from "@/lib/validation";
-import { isRedirectError } from "next/dist/client/components/redirect";
+
 import { lucia } from "@/auth";
+import prisma from "@/lib/prisma";
+import { logInSchema, LogInValues } from "@/lib/validation";
+import { verify } from "@node-rs/argon2";
+import { isRedirectError } from "next/dist/client/components/redirect";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -40,6 +41,7 @@ export async function login(
         error: "Incorrect username or password",
       };
     }
+
     const session = await lucia.createSession(existingUser.id, {});
     const sessionCookie = lucia.createSessionCookie(session.id);
     cookies().set(
@@ -47,12 +49,13 @@ export async function login(
       sessionCookie.value,
       sessionCookie.attributes
     );
+
     return redirect("/");
   } catch (error) {
     if (isRedirectError(error)) throw error;
     console.error(error);
     return {
-      error: "Something went wrong",
+      error: "Something went wrong. Please try again.",
     };
   }
 }
